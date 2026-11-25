@@ -1,0 +1,715 @@
+--- 17-18数据清洗.do
++++ code/01_cleaning_2017_2018.do
+@@ -1,30 +1,32 @@
+-import sasxport5 "<original-first-cycle-folder>\BMX_J.xpt", clear
+-save "<original-first-cycle-folder>\BMX_J.dta", replace
++* Called by 00_master.do; $root is the repository directory.
++cd "$root/work/2017_2018"
++import sasxport5 "$root/data/raw/2017_2018/BMX_J.xpt", clear
++save "$root/work/2017_2018/BMX_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\DEMO_J.xpt", clear
+-save "<original-first-cycle-folder>\DEMO_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/DEMO_J.xpt", clear
++save "$root/work/2017_2018/DEMO_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\DPQ_J.xpt", clear
+-save "<original-first-cycle-folder>\DPQ_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/DPQ_J.xpt", clear
++save "$root/work/2017_2018/DPQ_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\DR1IFF_J.xpt", clear
+-save "<original-first-cycle-folder>\DR1IFF_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/DR1IFF_J.xpt", clear
++save "$root/work/2017_2018/DR1IFF_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\DR2IFF_J.xpt", clear
+-save "<original-first-cycle-folder>\DR2IFF_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/DR2IFF_J.xpt", clear
++save "$root/work/2017_2018/DR2IFF_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\SLQ_J.xpt", clear
+-save "<original-first-cycle-folder>\SLQ_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/SLQ_J.xpt", clear
++save "$root/work/2017_2018/SLQ_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\FSQ_J.xpt", clear
+-save "<original-first-cycle-folder>\FSQ_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/FSQ_J.xpt", clear
++save "$root/work/2017_2018/FSQ_J.dta", replace
+ 
+-import sasxport5 "<original-first-cycle-folder>\DIQ_J.xpt", clear
+-save "<original-first-cycle-folder>\DIQ_J.dta", replace
++import sasxport5 "$root/data/raw/2017_2018/DIQ_J.xpt", clear
++save "$root/work/2017_2018/DIQ_J.dta", replace
+ 
+ 
+-cd "<original-first-cycle-folder>"
+-*处理心理健康 得出因变量phq9与phq8（用于睡眠中介）
++cd "$root/work/2017_2018"
++*Prepare PHQ9 and PHQ8 outcomes (PHQ8 for the sleep pathway)
+ use DPQ_J.dta, clear
+ foreach var of varlist dpq010-dpq090 {
+     replace `var' = . if `var' == 7 | `var' == 9
+@@ -36,7 +38,7 @@
+ save mental_final.dta, replace
+ 
+ 
+-*处理自变量
++*Prepare exposure variables
+ use DR1IFF_J.dta, clear
+ collapse (sum) dr1isugr dr1ikcal ///
+     (firstnm) wtdr2d wtdrd1, by(seqn)
+@@ -44,40 +46,40 @@
+ rename dr1ikcal dr1tkcal
+ save day1_nutri.dta, replace
+ 
+-* Day2 饮食数据
++* Day 2 dietary data
+ use DR2IFF_J.dta, clear
+ collapse (sum) dr2isugr dr2ikcal, by(seqn)
+ rename dr2isugr day2_sugar
+ rename dr2ikcal dr2tkcal
+ 
+-* 合并两天
++* Merge the two dietary days
+ merge 1:1 seqn using day1_nutri.dta
+ keep if _merge == 3
+ drop _merge
+ 
+-* 生成日均总糖
++* Compute mean daily total sugar
+ gen avg_sugar = (day1_sugar + day2_sugar)/2
+-* 生成日均总热量
++* Compute mean daily total energy
+ gen avg_energy = (dr1tkcal + dr2tkcal)/2
+-* 仅保留ID、糖摄入、权重和热量
++* Retain identifiers, sugar, weights, and energy
+ keep seqn day1_sugar day2_sugar avg_sugar ///
+     wtdr2d wtdrd1 dr1tkcal dr2tkcal avg_energy
+ 
+ save nutrition_final.dta, replace
+ 
+-*控制变量
++*Control variables
+ use DEMO_J.dta, clear
+ keep seqn dmdeduc2 dmdhhsiz indfmpir riagendr ridageyr sddsrvyr ridreth3 sdmvstra sdmvpsu
+ rename riagendr gender
+ rename ridageyr age
+-rename indfmpir pir      // 收入贫困比
++rename indfmpir pir      // Income-to-poverty ratio
+ rename dmdeduc2 edu
+ rename dmdhhsiz famsize
+ rename sddsrvyr cycle
+ rename ridreth3 race
+ save demo_final.dta, replace
+ 
+-*中介bmi 睡眠
++*BMI and sleep pathway variables
+ use BMX_J.dta, clear
+ keep seqn bmxbmi
+ rename bmxbmi bmi
+@@ -86,22 +88,22 @@
+ keep seqn sld012
+ rename sld012 sleep
+ save sleep_final.dta, replace
+-*粮食安全
++*Food security
+ use FSQ_J.dta, clear
+ keep seqn fsdad
+ save fsq_final.dta, replace
+-*糖尿病
++*Diabetes
+ use DIQ_J.dta, clear
+ keep seqn diq010
+ save diq_final.dta, replace
+ 
+ use demo_final.dta, clear
+ 
+-* 依次合并所有文件，保留主数据全部样本，匹配不到的变量填缺失值
++* Merge component files sequentially (original merge options retained)
+ merge 1:1 seqn using mental_final.dta, nogen
+ merge 1:1 seqn using nutrition_final.dta, nogen
+ merge 1:1 seqn using sleep_final.dta, nogen
+ merge 1:1 seqn using bmi_final.dta, nogen
+ merge 1:1 seqn using fsq_final.dta, nogen
+ merge 1:1 seqn using diq_final.dta, nogen
+-save 17_18final_analysis_data.dta, replace+save 17_18final_analysis_data.dta, replace
+--- 21-23数据清洗.do
++++ code/02_cleaning_2021_2023.do
+@@ -1,29 +1,31 @@
+-import sasxport5 "<original-second-cycle-folder>\BMX_L.xpt", clear
+-save "<original-second-cycle-folder>\BMX_L.dta", replace
++* Called by 00_master.do; $root is the repository directory.
++cd "$root/work/2021_2023"
++import sasxport5 "$root/data/raw/2021_2023/BMX_L.xpt", clear
++save "$root/work/2021_2023/BMX_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\DEMO_L.xpt", clear
+-save "<original-second-cycle-folder>\DEMO_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/DEMO_L.xpt", clear
++save "$root/work/2021_2023/DEMO_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\DPQ_L.xpt", clear
+-save "<original-second-cycle-folder>\DPQ_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/DPQ_L.xpt", clear
++save "$root/work/2021_2023/DPQ_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\DR1IFF_L.xpt", clear
+-save "<original-second-cycle-folder>\DR1IFF_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/DR1IFF_L.xpt", clear
++save "$root/work/2021_2023/DR1IFF_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\DR2IFF_L.xpt", clear
+-save "<original-second-cycle-folder>\DR2IFF_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/DR2IFF_L.xpt", clear
++save "$root/work/2021_2023/DR2IFF_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\SLQ_L.xpt", clear
+-save "<original-second-cycle-folder>\SLQ_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/SLQ_L.xpt", clear
++save "$root/work/2021_2023/SLQ_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\FSQ_L.xpt", clear
+-save "<original-second-cycle-folder>\FSQ_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/FSQ_L.xpt", clear
++save "$root/work/2021_2023/FSQ_L.dta", replace
+ 
+-import sasxport5 "<original-second-cycle-folder>\DIQ_L.xpt", clear
+-save "<original-second-cycle-folder>\DIQ_L.dta", replace
++import sasxport5 "$root/data/raw/2021_2023/DIQ_L.xpt", clear
++save "$root/work/2021_2023/DIQ_L.dta", replace
+ 
+-cd "<original-second-cycle-folder>"
+-*处理心理健康 得出因变量phq9 phq8
++cd "$root/work/2021_2023"
++*Prepare PHQ9 and PHQ8 outcomes
+ use DPQ_L.dta, clear
+ foreach var of varlist dpq010-dpq090 {
+     replace `var' = . if `var' == 7 | `var' == 9
+@@ -35,7 +37,7 @@
+ save mental_final.dta, replace
+ 
+ 
+-*处理自变量
++*Prepare exposure variables
+ use DR1IFF_L.dta, clear
+ collapse (sum) dr1isugr dr1ikcal ///
+     (firstnm) wtdr2d wtdrd1, by(seqn)
+@@ -43,22 +45,22 @@
+ rename dr1ikcal dr1tkcal
+ save day1_nutri.dta, replace
+ 
+-* Day2 饮食数据
++* Day 2 dietary data
+ use DR2IFF_L.dta, clear
+ collapse (sum) dr2isugr dr2ikcal, by(seqn)
+ rename dr2isugr day2_sugar
+ rename dr2ikcal dr2tkcal
+ 
+-* 合并两天
++* Merge the two dietary days
+ merge 1:1 seqn using day1_nutri.dta
+ keep if _merge == 3
+ drop _merge
+ 
+-* 生成日均总糖
++* Compute mean daily total sugar
+ gen avg_sugar = (day1_sugar + day2_sugar)/2
+-* 生成日均总热量
++* Compute mean daily total energy
+ gen avg_energy = (dr1tkcal + dr2tkcal)/2
+-* 仅保留ID、糖摄入、权重和热量
++* Retain identifiers, sugar, weights, and energy
+ keep seqn day1_sugar day2_sugar avg_sugar ///
+     wtdr2d wtdrd1 dr1tkcal dr2tkcal avg_energy
+ 
+@@ -66,7 +68,7 @@
+ 
+ 
+ 
+-*控制变量
++*Control variables
+ use DEMO_L.dta, clear
+ keep seqn dmdeduc2 dmdhhsiz indfmpir riagendr ridageyr sddsrvyr ridreth3 sdmvstra sdmvpsu
+ rename riagendr gender
+@@ -78,7 +80,7 @@
+ rename ridreth3 race
+ save demo_final.dta, replace
+ 
+-*中介bmi 睡眠
++*BMI and sleep pathway variables
+ use BMX_L.dta, clear
+ keep seqn bmxbmi
+ rename bmxbmi bmi
+@@ -87,11 +89,11 @@
+ keep seqn sld012
+ rename sld012 sleep
+ save sleep_final.dta, replace
+-*粮食安全
++*Food security
+ use FSQ_L.dta, clear
+ keep seqn fsdad
+ save fsq_final.dta, replace
+-*糖尿病
++*Diabetes
+ use DIQ_L.dta, clear
+ keep seqn diq010
+ save diq_final.dta, replace
+@@ -99,7 +101,7 @@
+ 
+ use demo_final.dta, clear
+ 
+-* 依次合并所有文件，保留主数据全部样本，匹配不到的变量填缺失值
++* Merge component files sequentially (original merge options retained)
+ merge 1:1 seqn using mental_final.dta, nogen
+ merge 1:1 seqn using nutrition_final.dta, nogen
+ merge 1:1 seqn using sleep_final.dta, nogen
+@@ -109,12 +111,12 @@
+ save 2022final_analysis_data.dta, replace
+ 
+ 
+-*新
+-*最终合并
++*Combined-cycle preparation
++*Combine cycles
+ use 2022final_analysis_data.dta, clear
+-append using 17_18final_analysis_data.dta
++append using "$root/work/2017_2018/17_18final_analysis_data.dta"
+ 
+-* 最终保存
++* Save combined data
+ save final_two_cycles.dta, replace
+ 
+ 
+--- 20261123新回归.do
++++ code/04_statistical_analysis.do
+@@ -1,18 +1,18 @@
+-cd "<original-second-cycle-folder>"
+-use final_two_cycles, clear
+-
+-**************************************************
+-* PART 1. 基础变量处理
+-**************************************************
+-
+-* 保留原来的性别编码方式
++cd "$root"
++use "$analysis_data", clear
++
++**************************************************
++* PART 1. Basic variable preparation
++**************************************************
++
++* Retain the original gender coding
+ replace gender = 0 if gender == 2
+ 
+-* 定义完整调整模型的控制变量
++* Define covariates for the fully adjusted model
+ local controls gender age edu famsize avg_energy pir i.race
+ 
+ **************************************************
+-* PART 2. 生成分析样本
++* PART 2. Define the analysis sample
+ **************************************************
+ 
+ capture drop sample_full
+@@ -25,14 +25,14 @@
+              wtdr2d,sdmvstra,sdmvpsu) & ///
+     wtdr2d > 0
+ 
+-* 查看两个Cycle的样本量
++* Inspect sample sizes by cycle
+ tab cycle if sample_full == 1
+ 
+ **************************************************
+ * PART 3. BASELINE
+ **************************************************
+ 
+-* 3.1 分别运行每个Cycle
++* 3.1 Run each cycle separately
+ 
+ levelsof cycle, local(cycles)
+ 
+@@ -58,11 +58,11 @@
+ }
+ 
+ **************************************************
+-* 3.2 两个Cycle合并Baseline
+-**************************************************
+-
+-* 注意：以下为探索性跨疫情周期合并设定
+-* 不是经过官方验证的合并调查权重
++* 3.2 Pooled baseline across both cycles
++**************************************************
++
++* Exploratory pooling across pre- and post-pandemic cycles
++* These pooled survey weights have not been officially validated
+ 
+ capture drop weight_pool strata_pool
+ 
+@@ -73,7 +73,7 @@
+ svyset sdmvpsu [pweight=weight_pool], ///
+     strata(strata_pool) singleunit(centered)
+ 
+-* 合并Baseline，保留i.cycle
++* Pooled baseline retaining i.cycle
+ svy, subpop(sample_full): regress ///
+     phq9 avg_sugar `controls' i.cycle
+ 
+@@ -82,7 +82,7 @@
+ 
+ **************************************************
+ * PART 4. ROBUSTNESS CHECK
+-* 以下所有分析使用合并数据库
++* All following analyses use the pooled dataset
+ **************************************************
+ 
+ *** Robustness 1: LPM
+@@ -102,7 +102,7 @@
+ svy, subpop(sample_full): logit ///
+     phq9_binary avg_sugar `controls' i.cycle
+ 
+-* 平均边际效应
++* Average marginal effect
+ margins, dydx(avg_sugar)
+ 
+ 
+@@ -141,28 +141,28 @@
+ 
+ **************************************************
+ * PART 5. HETEROGENEITY ANALYSIS
+-* 先分组回归，再进行Interaction Test
+-* 使用合并数据库
+-**************************************************
+-
+-* 前提：
+-* 已完成PART 1-4
+-* 已经定义sample_full
+-* 已经设置合并样本svyset
++* Run subgroup regressions followed by interaction tests
++* Use the pooled dataset
++**************************************************
++
++* Prerequisites:
++* Parts 1-4 completed
++* sample_full defined
++* Pooled survey design declared
+ 
+ 
+ **************************************************
+ * 5.1 Diabetes
+ **************************************************
+ 
+-* 保留原来的3个分组
++* Retain the original three groups
+ * 1 = Yes
+ * 2 = No
+ * 3 = Borderline
+ 
+ tab diq010 if sample_full == 1, missing
+ 
+-* 定义糖尿病异质性样本
++* Define the diabetes heterogeneity sample
+ capture drop sample_diabetes
+ 
+ gen byte sample_diabetes = ///
+@@ -215,23 +215,23 @@
+ 
+ display "Diabetes Interaction Test"
+ 
+-* 以diq010==2（No）作为参照组
++* Use diq010==2 (No) as reference
+ 
+ svy, subpop(sample_diabetes): regress ///
+     phq9 c.avg_sugar##ib2.diq010 ///
+     gender age edu famsize ///
+     avg_energy pir i.race i.cycle
+ 
+-* Diabetes Yes 与 No 的系数差异
++* Coefficient difference: diabetes Yes versus No
+ lincom 1.diq010#c.avg_sugar
+ 
+-* Borderline 与 No 的系数差异
++* Coefficient difference: Borderline versus No
+ lincom 3.diq010#c.avg_sugar
+ 
+-* 所有组之间的联合交互检验
++* Joint interaction test across groups
+ testparm i.diq010#c.avg_sugar
+ 
+-* 各组糖摄入的边际斜率
++* Marginal sugar slope by group
+ margins diq010, dydx(avg_sugar)
+ 
+ 
+@@ -239,7 +239,7 @@
+ * 5.2 Income
+ **************************************************
+ 
+-* 保留你原来的收入分组标准
++* Retain the original income thresholds
+ 
+ capture drop pir_group
+ 
+@@ -300,8 +300,8 @@
+ 
+ display "Income Interaction Test"
+ 
+-* 与原来分组模型保持一致
+-* 不重复将pir作为连续控制变量
++* Match the original subgroup specification
++* Do not additionally adjust for continuous pir
+ 
+ svy, subpop(sample_full): regress ///
+     phq9 c.avg_sugar##ib1.pir_group ///
+@@ -314,10 +314,10 @@
+ * High vs Low
+ lincom 3.pir_group#c.avg_sugar
+ 
+-* 联合检验
++* Joint test
+ testparm i.pir_group#c.avg_sugar
+ 
+-* 各收入组的糖摄入斜率
++* Sugar slope by income group
+ margins pir_group, dydx(avg_sugar)
+ 
+ 
+@@ -368,7 +368,7 @@
+ * Male vs Female
+ lincom 1.gender#c.avg_sugar
+ 
+-* 各组糖摄入斜率
++* Sugar slope by group
+ margins gender, dydx(avg_sugar)
+ 
+ **************************************************
+@@ -385,7 +385,7 @@
+ * PATH 1: avg_sugar -> sleep -> phq8
+ **************************************************
+ 
+-* 生成睡眠分析样本
++* Define the sleep analysis sample
+ capture drop sample_sleep
+ 
+ gen byte sample_sleep = ///
+@@ -393,7 +393,7 @@
+ 
+ 
+ * =========================================
+-* 1. 基础三步回归
++* 1. Basic three-step regressions
+ * =========================================
+ 
+ display "PATH 1 - SLEEP BASIC ANALYSIS"
+@@ -423,16 +423,16 @@
+ * 2. Bootstrap
+ * =========================================
+ 
+-* 每个调查周期中的分层和PSU独立编码
++* Encode strata and PSUs separately by cycle
+ capture drop boot_strata boot_psu
+ 
+ egen boot_strata = group(cycle sdmvstra)
+ egen boot_psu = group(cycle sdmvstra sdmvpsu)
+ 
+-* 删除之前定义的程序
++* Drop the previously defined program
+ capture program drop med_sleep
+ 
+-* 定义Bootstrap程序
++* Define the bootstrap program
+ program define med_sleep, rclass
+ 
+     * Path a
+@@ -463,7 +463,7 @@
+ 
+     local ctotal = _b[avg_sugar]
+ 
+-    * 返回估计结果
++    * Return estimates
+     return scalar a = `a'
+     return scalar b = `b'
+     return scalar indirect = `a' * `b'
+@@ -474,7 +474,7 @@
+ 
+ 
+ * =========================================
+-* 3. 检验Bootstrap程序
++* 3. Test the bootstrap program
+ * =========================================
+ 
+ med_sleep
+@@ -482,12 +482,12 @@
+ 
+ 
+ * =========================================
+-* 4. 分层PSU Bootstrap
++* 4. Stratified PSU bootstrap
+ * =========================================
+ 
+ preserve
+ 
+-* 保留抽样设计信息有效的记录
++* Retain records with valid survey design information
+ keep if !missing(boot_strata,boot_psu,weight_pool)
+ keep if weight_pool > 0
+ 
+@@ -502,7 +502,7 @@
+     cluster(boot_psu) ///
+     strata(boot_strata): med_sleep
+ 
+-* Bootstrap置信区间
++* Bootstrap confidence intervals
+ estat bootstrap, percentile bc
+ 
+ restore
+@@ -516,11 +516,11 @@
+ 
+ **************************************************
+ * PATH 2: Food Security -> Sugar -> PHQ9
+-* 食品安全探索性分析
+-**************************************************
+-
+-* =========================================
+-* 1. 生成食品安全分类变量
++* Exploratory food security analysis
++**************************************************
++
++* =========================================
++* 1. Define food security categories
+ * =========================================
+ 
+ capture drop foodsec_cat
+@@ -536,19 +536,19 @@
+ 
+ label values foodsec_cat foodlbl
+ 
+-* 生成有效分析样本
++* Define the valid analysis sample
+ capture drop sample_food
+ 
+ gen byte sample_food = ///
+     sample_full == 1 & !missing(foodsec_cat)
+ 
+-* 检查样本
++* Inspect the sample
+ tab foodsec_cat if sample_food == 1
+ tab cycle if sample_food == 1
+ 
+ 
+ * =========================================
+-* 2. 基础三步回归
++* 2. Basic three-step regressions
+ * =========================================
+ 
+ * Step 1: Food Security -> PHQ9
+@@ -571,7 +571,7 @@
+ 
+ 
+ * =========================================
+-* 3. 生成Bootstrap抽样变量
++* 3. Generate bootstrap sampling variables
+ * =========================================
+ 
+ capture drop boot_strata boot_psu
+@@ -581,7 +581,7 @@
+ 
+ 
+ * =========================================
+-* 4. 定义Bootstrap程序
++* 4. Define the bootstrap program
+ * =========================================
+ 
+ capture program drop med_food
+@@ -621,7 +621,7 @@
+ 
+     local ctotal = _b[`compare'.foodsec_cat]
+ 
+-    * 返回结果
++    * Return results
+     return scalar a = `a'
+     return scalar b = `b'
+     return scalar indirect = `a' * `b'
+@@ -632,16 +632,16 @@
+ 
+ 
+ * =========================================
+-* 5. Bootstrap：分别比较三个食品安全等级
++* 5. Bootstrap comparisons for three food security categories
+ * =========================================
+ 
+ preserve
+ 
+-* 保留具有有效抽样设计信息的观察值
++* Retain observations with valid survey design information
+ keep if !missing(boot_strata,boot_psu,weight_pool)
+ keep if weight_pool > 0
+ 
+-* 依次比较：
++* Sequential comparisons:
+ * 2 vs 1
+ * 3 vs 1
+ * 4 vs 1
+@@ -652,7 +652,7 @@
+     display "Food Security: Group `g' vs Group 1"
+     display "=================================="
+ 
+-    * 检查两个类别是否存在
++    * Check that both categories are present
+     quietly count if sample_food == 1 ///
+         & foodsec_cat == 1
+     local nbase = r(N)
+@@ -663,11 +663,11 @@
+ 
+     if `nbase' > 0 & `ncomp' > 0 {
+ 
+-        * 首先运行原始样本估计
++        * First estimate on the original sample
+         med_food, compare(`g')
+         return list
+ 
+-        * PSU分层Bootstrap
++        * Stratified PSU bootstrap
+         bootstrap ///
+             a=r(a) ///
+             b=r(b) ///
+@@ -681,7 +681,7 @@
+             reject(missing(r(indirect))): ///
+             med_food, compare(`g')
+ 
+-        * Bootstrap置信区间
++        * Bootstrap confidence intervals
+         estat bootstrap, percentile
+     }
+ }
+@@ -695,12 +695,12 @@
+ 
+ 
+ **************************************************
+-* PART 7. 第一日膳食稳健性检验
+-**************************************************
+-
+-* 注意：第一日分析应保留所有有效Day1受访者
+-* 如果合并数据已提前删除Day2缺失者，
+-* 需要从完整第一日样本重新建立数据
++* PART 7. Day 1 dietary robustness analysis
++**************************************************
++
++* Day 1 analysis should retain all valid Day 1 respondents
++* If records missing Day 2 have already been removed,
++* rebuild the dataset from the complete Day 1 sample
+ 
+ capture drop sample_day1
+ 
+@@ -712,8 +712,8 @@
+              wtdrd1,sdmvstra,sdmvpsu) & ///
+     wtdrd1 > 0
+ 
+-* 以下为探索性合并周期第一日分析
+-* 跨疫情周期权重仍需方法学确认
++* Exploratory pooled-cycle Day 1 analysis
++* Cross-pandemic pooled weights still require methodological validation
+ 
+ capture drop weight_day1
+ 

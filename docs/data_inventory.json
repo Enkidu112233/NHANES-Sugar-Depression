@@ -1,0 +1,118 @@
+{
+  "datasets": [
+    {
+      "file": "data/processed/17_18final_analysis_data.dta",
+      "observations": 9254,
+      "variables": 24,
+      "variable_names": [
+        "seqn",
+        "cycle",
+        "gender",
+        "age",
+        "race",
+        "edu",
+        "famsize",
+        "sdmvpsu",
+        "sdmvstra",
+        "pir",
+        "phq9",
+        "phq8",
+        "day2_sugar",
+        "dr2tkcal",
+        "day1_sugar",
+        "dr1tkcal",
+        "wtdr2d",
+        "wtdrd1",
+        "avg_sugar",
+        "avg_energy",
+        "sleep",
+        "bmi",
+        "fsdad",
+        "diq010"
+      ],
+      "cycles": {
+        "10.0": 9254
+      },
+      "baseline_eligible_count_python_check": 1383,
+      "duplicate_seqn": 0,
+      "smoking_variable_name_matches": []
+    },
+    {
+      "file": "data/processed/2022final_analysis_data.dta",
+      "observations": 11933,
+      "variables": 24,
+      "variable_names": [
+        "seqn",
+        "cycle",
+        "gender",
+        "age",
+        "race",
+        "edu",
+        "famsize",
+        "sdmvstra",
+        "sdmvpsu",
+        "pir",
+        "phq9",
+        "phq8",
+        "day2_sugar",
+        "dr2tkcal",
+        "day1_sugar",
+        "dr1tkcal",
+        "wtdr2d",
+        "wtdrd1",
+        "avg_sugar",
+        "avg_energy",
+        "sleep",
+        "bmi",
+        "fsdad",
+        "diq010"
+      ],
+      "cycles": {
+        "12.0": 11933
+      },
+      "baseline_eligible_count_python_check": 1084,
+      "duplicate_seqn": 0,
+      "smoking_variable_name_matches": []
+    },
+    {
+      "file": "data/processed/final_two_cycles.dta",
+      "observations": 21187,
+      "variables": 24,
+      "variable_names": [
+        "seqn",
+        "cycle",
+        "gender",
+        "age",
+        "race",
+        "edu",
+        "famsize",
+        "sdmvstra",
+        "sdmvpsu",
+        "pir",
+        "phq9",
+        "phq8",
+        "day2_sugar",
+        "dr2tkcal",
+        "day1_sugar",
+        "dr1tkcal",
+        "wtdr2d",
+        "wtdrd1",
+        "avg_sugar",
+        "avg_energy",
+        "sleep",
+        "bmi",
+        "fsdad",
+        "diq010"
+      ],
+      "cycles": {
+        "12.0": 11933,
+        "10.0": 9254
+      },
+      "baseline_eligible_count_python_check": 2467,
+      "duplicate_seqn": 0,
+      "smoking_variable_name_matches": []
+    }
+  ],
+  "pooled_equals_cycle_2021_2023_then_2017_2018": true,
+  "comparison": "Pandas values, row order, column alignment, and dtypes; Stata labels and formats not part of this append comparison."
+}

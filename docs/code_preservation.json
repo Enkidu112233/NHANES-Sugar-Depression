@@ -1,0 +1,17 @@
+[
+  {
+    "file": "code/01_cleaning_2017_2018.do",
+    "preserved_command_lines": 74,
+    "result": "PASS"
+  },
+  {
+    "file": "code/02_cleaning_2021_2023.do",
+    "preserved_command_lines": 77,
+    "result": "PASS"
+  },
+  {
+    "file": "code/04_statistical_analysis.do",
+    "preserved_command_lines": 327,
+    "result": "PASS"
+  }
+]

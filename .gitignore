@@ -1,0 +1,17 @@
+# External raw data are downloaded locally using data/README.md.
+data/raw/**/*.xpt
+data/raw/**/*.XPT
+# Generated intermediates and execution logs.
+work/*
+!work/.gitkeep
+output/logs/*
+!output/logs/.gitkeep
+*.smcl
+*.stswp
+__pycache__/
+.DS_Store
+Thumbs.db
+
+# Optional local copy of the published Stata dependency.
+vendor/gologit2/*
+!vendor/gologit2/.gitkeep

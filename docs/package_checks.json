@@ -1,0 +1,70 @@
+{
+  "analysis_entry_stata_18": "PASS",
+  "full_entry_stata_18": "PASS",
+  "installed_older_ado_cache_refresh": "PASS",
+  "missing_gsvy_preflight": "PASS (clear diagnostic and r(111))",
+  "tested_extensions": {
+    "gologit2": "3.2.8",
+    "gsvy": "3.2.8"
+  },
+  "partial_proportional_odds": {
+    "subpopulation": 2467,
+    "strata": 30,
+    "psus": 60,
+    "thresholds": [
+      5,
+      10,
+      15,
+      20
+    ],
+    "sugar_log_odds": [
+      0.0020536,
+      0.0027483,
+      0.0033941,
+      0.0027893
+    ],
+    "p_values": [
+      0.164,
+      0.072,
+      0.059,
+      0.32
+    ],
+    "same_on_both_routes": true
+  },
+  "rebuilt_datasets": [
+    {
+      "file": "17_18final_analysis_data.dta",
+      "rows": 9254,
+      "variables": 24,
+      "values_row_order_and_dtypes_match": true
+    },
+    {
+      "file": "2022final_analysis_data.dta",
+      "rows": 11933,
+      "variables": 24,
+      "values_row_order_and_dtypes_match": true
+    },
+    {
+      "file": "final_two_cycles.dta",
+      "rows": 21187,
+      "variables": 24,
+      "values_row_order_and_dtypes_match": true
+    }
+  ],
+  "reference_xpt_sha256": "PASS (16 files)",
+  "storage_type_restored": "PASS",
+  "baseline_sample_sizes_agree": [
+    1383,
+    1084,
+    2467
+  ],
+  "baseline_results_agree_at_printed_precision": true,
+  "bootstrap_replications_per_run": [
+    2000,
+    2000,
+    2000,
+    2000
+  ],
+  "bootstrap_indirect_estimates_agree_at_printed_precision": true,
+  "local_document_links": "PASS"
+}

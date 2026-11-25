@@ -1,0 +1,50 @@
+[
+  {
+    "file": "code/01_cleaning_2017_2018.do",
+    "source_filename": "17-18数据清洗.do",
+    "source_bytes": 3434,
+    "source_sha256": "2706e718a5d66c0ce0a6184a65a8a6d2990c685522b7d7bf6a1a1a05a12e9ba9",
+    "packaged_sha256": "233dbc0ef9a613eb7257c102ce43b2d3a8422c6c97f77ce3fb474813483bb5de",
+    "data_identical": null
+  },
+  {
+    "file": "code/02_cleaning_2021_2023.do",
+    "source_filename": "21-23数据清洗.do",
+    "source_bytes": 3474,
+    "source_sha256": "337d9fdeec1915b9c0dd217fb002c06c25b0f14779d6fff7da4fb4518d2a100d",
+    "packaged_sha256": "5281e84e3277b9d10ab85efef55a72cb86515d602ce0df891a770a734f810e05",
+    "data_identical": null
+  },
+  {
+    "file": "code/04_statistical_analysis.do",
+    "source_filename": "20261123新回归.do",
+    "source_bytes": 17803,
+    "source_sha256": "e15cfc9765924b3111353a2ef1843c8b4352737dc89763f8477aca818f3f79a4",
+    "packaged_sha256": "135eb4fe44f2a0014fe8b32d5ddb75df78b2d390af695dabcc46f0280dbdc09e",
+    "data_identical": null
+  },
+  {
+    "file": "data/processed/17_18final_analysis_data.dta",
+    "source_filename": "17_18final_analysis_data.dta",
+    "source_bytes": 1792683,
+    "source_sha256": "0bb28b712df6e4eed35f15eca529840b67e1f9bb060a3c8419412aef27939fc5",
+    "packaged_sha256": "0bb28b712df6e4eed35f15eca529840b67e1f9bb060a3c8419412aef27939fc5",
+    "data_identical": true
+  },
+  {
+    "file": "data/processed/2022final_analysis_data.dta",
+    "source_filename": "2022final_analysis_data.dta",
+    "source_bytes": 2307051,
+    "source_sha256": "cedd739cb2dc6b7202b9a00d2fe416ccba082a997bfb3140445b3d24db52df4a",
+    "packaged_sha256": "cedd739cb2dc6b7202b9a00d2fe416ccba082a997bfb3140445b3d24db52df4a",
+    "data_identical": true
+  },
+  {
+    "file": "data/processed/final_two_cycles.dta",
+    "source_filename": "final_two_cycles.dta",
+    "source_bytes": 4083819,
+    "source_sha256": "1b5746153388094d3f84904bd88231dc6a89e24e1e78c4694a9d5117959a398c",
+    "packaged_sha256": "1b5746153388094d3f84904bd88231dc6a89e24e1e78c4694a9d5117959a398c",
+    "data_identical": true
+  }
+]
